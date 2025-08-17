@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-api-deployment
+  labels:
+    app: mongo-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mongo-api
+  template:
+    metadata:
+      labels:
+        app: mongo-api
+    spec:
+      containers:
+        - name: fastapi-container
+          image: "docker.io/YOUR_DOCKERHUB_USERNAME/fastapi-mongo-crud:latest"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MONGO_HOST
+              # --- THIS IS THE KEY CHANGE ---
+              value: "mongo-db-headless-service" 
+            - name: MONGO_PORT
+              value: "27017"
+            - name: MONGO_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-db-credentials
+                  key: MONGO_DB_NAME
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-db-credentials
+                  key: MONGO_INITDB_ROOT_USERNAME
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-db-credentials
+                  key: MONGO_INITDB_ROOT_PASSWORD

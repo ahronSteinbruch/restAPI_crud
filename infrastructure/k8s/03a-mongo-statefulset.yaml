@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-db-statefulset
+  labels:
+    app: mongo-db
+spec:
+  serviceName: "mongo-db-headless-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-db
+  template:
+    metadata:
+      labels:
+        app: mongo-db
+    spec:
+      containers:
+        - name: mongo
+          image: docker.io/library/mongo:6.0
+          ports:
+            - containerPort: 27017
+          envFrom:
+            - secretRef:
+                name: mongo-db-credentials
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-persistent-storage
+      labels:
+        app: mongo-db
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 2Gi
