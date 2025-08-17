@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-service
+  labels:
+    app: fastapi
+spec:
+  selector:
+    app: fastapi # This service targets pods with the label 'app: fastapi'
+  ports:
+    - protocol: TCP
+      port: 8080       # Port exposed by the service
+      targetPort: 8080   # Port on the pod to forward traffic to
+  type: ClusterIP      # Default type, exposes the service only inside the cluster

@@ -1,0 +1,16 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: fastapi-route
+  labels:
+    app: fastapi
+spec:
+  to:
+    kind: Service
+    name: fastapi-service # The service to expose
+  port:
+    targetPort: 8080
+  tls:
+    # OpenShift will automatically provide an SSL certificate for this route
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
