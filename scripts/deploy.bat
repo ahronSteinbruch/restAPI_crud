@@ -9,7 +9,17 @@ IF "%1"=="" (
 )
 SET DOCKERHUB_USERNAME=%1
 SET IMAGE_NAME=fastapi-mongo-crud
-SET IMAGE_TAG=latest
+
+REM --- NEW: Generate a unique image tag using a timestamp ---
+REM This creates a tag like YYYYMMDD-HHMMSS
+FOR /f "tokens=1-4 delims=/ " %%a in ("%date%") do (
+    FOR /f "tokens=1-3 delims=:" %%e in ("%time%") do (
+        SET IMAGE_TAG=%%c%%b%%a-%%e%%f%%g
+    )
+)
+echo INFO: Using unique image tag: %IMAGE_TAG%
+REM -------------------------------------------------------------
+
 SET FULL_IMAGE_NAME=docker.io/%DOCKERHUB_USERNAME%/%IMAGE_NAME%:%IMAGE_TAG%
 
 echo.
@@ -17,7 +27,7 @@ echo ===========================================================================
 echo    Step 1: Building and Pushing Docker Image
 echo ================================================================================
 echo Image to be built: %FULL_IMAGE_NAME%
-docker buildx build --platform linux/amd64 -t "%FULL_IMAGE_NAME%" --push .
+docker buildx build --no-cache --platform linux/amd64 -t "%FULL_IMAGE_NAME%" --push .
 echo Image successfully pushed to Docker Hub.
 
 echo.
@@ -41,8 +51,9 @@ echo SUCCESS: MongoDB is ready.
 
 echo.
 echo ---^> Deploying FastAPI Application...
-REM Using powershell for the sed-like replacement
-powershell -Command "(Get-Content 05-fastapi-deployment.yaml) -replace 'YOUR_DOCKERHUB_USERNAME', '%DOCKERHUB_USERNAME%' | oc apply -f -"
+REM --- UPDATED: Use PowerShell to replace both username AND tag ---
+powershell -Command "(Get-Content 05-fastapi-deployment.yaml) -replace 'YOUR_DOCKERHUB_USERNAME', '%DOCKERHUB_USERNAME%' -replace ':latest', ':%IMAGE_TAG%' | oc apply -f -"
+REM -----------------------------------------------------------------
 oc apply -f 06-fastapi-service.yaml
 echo Waiting for FastAPI to be ready...
 oc wait --for=condition=ready pod -l app=mongo-api --timeout=300s

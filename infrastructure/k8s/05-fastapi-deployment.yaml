@@ -16,10 +16,8 @@ spec:
     spec:
       containers:
         - name: fastapi-container
-          image: "docker.io/a0533057932/fastapi-mongo-crud:latest"
+          image: "docker.io/YOUR_DOCKERHUB_USERNAME/fastapi-mongo-crud:latest"
           imagePullPolicy: Always
-          command: [ "/bin/sh", "-c" ]
-          args: [ "echo '--- Environment Variables ---' && printenv && echo '--- Sleeping forever ---' && sleep infinity" ]
           ports:
             - containerPort: 8080
           env:

@@ -17,7 +17,11 @@ if [ -z "$1" ]; then
 fi
 DOCKERHUB_USERNAME="$1"
 IMAGE_NAME="fastapi-mongo-crud"
-IMAGE_TAG="latest"
+IMAGE_TAG=$(git rev-parse --short HEAD)
+if [ -z "$IMAGE_TAG" ]; then
+    IMAGE_TAG=$(date +%s)
+fi
+echo "INFO: Using unique image tag: $IMAGE_TAG"
 FULL_IMAGE_NAME="docker.io/${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
 
 set -e
@@ -34,7 +38,7 @@ function print_header() {
 # Step 1: Build and Push Docker Image (Run from project root)
 print_header "Step 1: Building and Pushing Docker Image"
 echo "Image to be built: ${FULL_IMAGE_NAME}"
-(cd "$PROJECT_ROOT" && docker buildx build --platform linux/amd64 -t "${FULL_IMAGE_NAME}" --push .)
+(cd "$PROJECT_ROOT" && docker buildx build --no-cache --platform linux/amd64 -t "${FULL_IMAGE_NAME}" --push .)
 echo "Image successfully pushed to Docker Hub."
 
 # Step 2: Apply Infrastructure to OpenShift
@@ -55,7 +59,9 @@ echo "SUCCESS: MongoDB is ready."
 
 # Apply FastAPI manifests
 print_header "--> Deploying FastAPI Application..."
-sed "s|YOUR_DOCKERHUB_USERNAME|${DOCKERHUB_USERNAME}|g" "$K8S_DIR/05-fastapi-deployment.yaml" | oc apply -f -
+sed -e "s|YOUR_DOCKERHUB_USERNAME|${DOCKERHUB_USERNAME}|g" \
+    -e "s|:latest|:${IMAGE_TAG}|g" \
+    "$K8S_DIR/05-fastapi-deployment.yaml" | oc apply -f -
 oc apply -f "$K8S_DIR/06-fastapi-service.yaml"
 echo "Waiting for FastAPI to be ready..."
 oc wait --for=condition=ready pod -l app=mongo-api --timeout=300s
