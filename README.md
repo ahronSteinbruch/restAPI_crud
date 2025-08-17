@@ -85,9 +85,9 @@ This project is designed to be deployed from start to finish with a single scrip
     ```bash
     chmod +x scripts/deploy.sh
     ```
-    Then, run it:
+    Then, run it from the project root directory, providing your Docker Hub username as an argument:
     ```bash
-    ./scripts/deploy.sh
+    ./scripts/deploy.sh your-dockerhub-username
     ```
     The script will guide you through the process and print the final application URL upon completion.
 

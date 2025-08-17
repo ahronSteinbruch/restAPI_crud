@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: mongo
-          image: mongo:6.0 # Using an official MongoDB image from Docker Hub
+          image: docker.io/library/mongo:6.0 # Using an official MongoDB image from Docker Hub
           ports:
             - containerPort: 27017
           # Mount the Secret as environment variables for the container
