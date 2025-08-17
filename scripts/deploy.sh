@@ -1,8 +1,7 @@
 #!/bin/bash
-# This script automates the entire deployment process and is safe to run from any directory.
+# This script automates the entire deployment process for the FastAPI MongoDB service.
 
 # --- Setup: Find the project's root directory ---
-# This makes the script robust. We find the directory where the '.git' folder is.
 PROJECT_ROOT=$(git rev-parse --show-toplevel)
 if [ -z "$PROJECT_ROOT" ]; then
     echo "ERROR: This is not a git repository. Cannot determine project root."
@@ -35,7 +34,6 @@ function print_header() {
 # Step 1: Build and Push Docker Image (Run from project root)
 print_header "Step 1: Building and Pushing Docker Image"
 echo "Image to be built: ${FULL_IMAGE_NAME}"
-# Use 'cd' to temporarily change to the project root for the build command
 (cd "$PROJECT_ROOT" && docker buildx build --platform linux/amd64 -t "${FULL_IMAGE_NAME}" --push .)
 echo "Image successfully pushed to Docker Hub."
 
@@ -52,7 +50,7 @@ oc apply -f "$K8S_DIR/02-mongo-pvc.yaml"
 oc apply -f "$K8S_DIR/03-mongo-deployment.yaml"
 oc apply -f "$K8S_DIR/04-mongo-service.yaml"
 echo "Waiting for MongoDB to be ready..."
-oc wait --for=condition=ready pod -l app=mongo --timeout=300s
+oc wait --for=condition=ready pod -l app=mongo-db --timeout=300s
 echo "SUCCESS: MongoDB is ready."
 
 # Apply FastAPI manifests
@@ -60,7 +58,7 @@ print_header "--> Deploying FastAPI Application..."
 sed "s|YOUR_DOCKERHUB_USERNAME|${DOCKERHUB_USERNAME}|g" "$K8S_DIR/05-fastapi-deployment.yaml" | oc apply -f -
 oc apply -f "$K8S_DIR/06-fastapi-service.yaml"
 echo "Waiting for FastAPI to be ready..."
-oc wait --for=condition=ready pod -l app=fastapi --timeout=300s
+oc wait --for=condition=ready pod -l app=mongo-api --timeout=300s
 echo "SUCCESS: FastAPI Application is ready."
 
 # Apply Route
@@ -70,7 +68,7 @@ echo "SUCCESS: Route created."
 
 # Final step: Display the route
 print_header "Deployment Complete!"
-ROUTE_URL=$(oc get route fastapi-route -o jsonpath='{.spec.host}')
+ROUTE_URL=$(oc get route mongo-api-route -o jsonpath='{.spec.host}')
 echo "Your application is available at:"
 echo "http://${ROUTE_URL}"
 echo ""

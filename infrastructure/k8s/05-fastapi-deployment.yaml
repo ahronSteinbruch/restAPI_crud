@@ -16,24 +16,28 @@ spec:
     spec:
       containers:
         - name: fastapi-container
-          image: "docker.io/YOUR_DOCKERHUB_USERNAME/fastapi-mongo-crud:latest"
+          image: "docker.io/a0533057932/fastapi-mongo-crud:latest"
           imagePullPolicy: Always
+          command: [ "/bin/sh", "-c" ]
+          args: [ "echo '--- Environment Variables ---' && printenv && echo '--- Sleeping forever ---' && sleep infinity" ]
           ports:
             - containerPort: 8080
           env:
-            - name: MONGO_URI
-              value: "mongodb://$(MONGO_INITDB_ROOT_USERNAME):$(MONGO_INITDB_ROOT_PASSWORD)@mongo-db-service:27017" # <--- שינוי
+            - name: MONGO_HOST
+              value: "mongo-db-service"
+            - name: MONGO_PORT
+              value: "27017"
             - name: MONGO_DB_NAME
               valueFrom:
                 secretKeyRef:
                   name: mongo-db-credentials
                   key: MONGO_DB_NAME
-            - name: MONGO_INITDB_ROOT_USERNAME
+            - name: MONGO_USER
               valueFrom:
                 secretKeyRef:
                   name: mongo-db-credentials
                   key: MONGO_INITDB_ROOT_USERNAME
-            - name: MONGO_INITDB_ROOT_PASSWORD
+            - name: MONGO_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mongo-db-credentials
