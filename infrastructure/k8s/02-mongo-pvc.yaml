@@ -1,7 +1,9 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mongo-pvc
+   name: mongo-db-pvc
+   labels:
+     app: mongo-db
 spec:
   accessModes:
     - ReadWriteOnce # This volume can be mounted as read-write by a single pod

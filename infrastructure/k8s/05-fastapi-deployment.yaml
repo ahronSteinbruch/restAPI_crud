@@ -1,42 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fastapi-deployment
+  name: mongo-api-deployment
   labels:
-    app: fastapi
+    app: mongo-api
 spec:
-  replicas: 2 # Let's run two replicas for high availability
+  replicas: 2
   selector:
     matchLabels:
-      app: fastapi
+      app: mongo-api
   template:
     metadata:
       labels:
-        app: fastapi
+        app: mongo-api
     spec:
       containers:
         - name: fastapi-container
-          # IMPORTANT: Replace with the actual image path you will push to Docker Hub
           image: "docker.io/YOUR_DOCKERHUB_USERNAME/fastapi-mongo-crud:latest"
-          imagePullPolicy: Always # Ensures OpenShift always pulls the freshest image
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:
-            # Inject the database connection details from our secret and service name
             - name: MONGO_URI
-              value: "mongodb://$(MONGO_INITDB_ROOT_USERNAME):$(MONGO_INITDB_ROOT_PASSWORD)@mongo-service:27017"
+              value: "mongodb://$(MONGO_INITDB_ROOT_USERNAME):$(MONGO_INITDB_ROOT_PASSWORD)@mongo-db-service:27017" # <--- שינוי
             - name: MONGO_DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: mongo-credentials
+                  name: mongo-db-credentials
                   key: MONGO_DB_NAME
             - name: MONGO_INITDB_ROOT_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: mongo-credentials
+                  name: mongo-db-credentials
                   key: MONGO_INITDB_ROOT_USERNAME
             - name: MONGO_INITDB_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mongo-credentials
+                  name: mongo-db-credentials
                   key: MONGO_INITDB_ROOT_PASSWORD

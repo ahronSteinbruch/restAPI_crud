@@ -1,39 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo-deployment
+  name: mongo-db-deployment
+  labels:
+    app: mongo-db
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mongo
+      app: mongo-db
   template:
     metadata:
       labels:
-        app: mongo
+        app: mongo-db
     spec:
       containers:
         - name: mongo
-          image: docker.io/library/mongo:6.0 # Using an official MongoDB image from Docker Hub
+          image: docker.io/library/mongo:6.0
           ports:
             - containerPort: 27017
-          # Mount the Secret as environment variables for the container
-          env:
-            - name: MONGO_INITDB_ROOT_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: mongo-credentials
-                  key: MONGO_INITDB_ROOT_USERNAME
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mongo-credentials
-                  key: MONGO_INITDB_ROOT_PASSWORD
-          # Mount the Persistent Volume to MongoDB's data directory
+          envFrom:
+            - secretRef:
+                name: mongo-db-credentials
           volumeMounts:
             - name: mongo-persistent-storage
               mountPath: /data/db
       volumes:
         - name: mongo-persistent-storage
           persistentVolumeClaim:
-            claimName: mongo-pvc
+            claimName: mongo-db-pvc
