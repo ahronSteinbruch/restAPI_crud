@@ -3,21 +3,24 @@ kind: Deployment
 metadata:
   name: mongo-api-deployment
   labels:
-    app: mongo-api
+    app.kubernetes.io/name: fastapi-mongo
+    app.kubernetes.io/instance: mongo-api
+    app.kubernetes.io/part-of: mongo-loader-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: mongo-api
+      app.kubernetes.io/instance: mongo-api
   template:
     metadata:
       labels:
-        app: mongo-api
+        app.kubernetes.io/name: fastapi-mongo
+        app.kubernetes.io/instance: mongo-api
+        app.kubernetes.io/part-of: mongo-loader-app
     spec:
       containers:
         - name: fastapi-container
           image: "docker.io/YOUR_DOCKERHUB_USERNAME/fastapi-mongo-crud:latest"
-          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:
@@ -27,13 +30,13 @@ spec:
               value: "27017"
             - name: MONGO_DB_NAME
               valueFrom:
-                secretKeyRef:
-                  name: mongo-db-credentials
+                configMapKeyRef:
+                  name: mongo-db-config
                   key: MONGO_DB_NAME
             - name: MONGO_USER
               valueFrom:
-                secretKeyRef:
-                  name: mongo-db-credentials
+                configMapKeyRef:
+                  name: mongo-db-config
                   key: MONGO_INITDB_ROOT_USERNAME
             - name: MONGO_PASSWORD
               valueFrom:

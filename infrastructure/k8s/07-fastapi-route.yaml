@@ -3,7 +3,9 @@ kind: Route
 metadata:
   name: mongo-api-route
   labels:
-    app: mongo-api
+    app.kubernetes.io/name: fastapi-mongo
+    app.kubernetes.io/instance: mongo-api
+    app.kubernetes.io/part-of: mongo-loader-app
 spec:
   to:
     kind: Service

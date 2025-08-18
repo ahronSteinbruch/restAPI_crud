@@ -3,10 +3,12 @@ kind: PersistentVolumeClaim
 metadata:
    name: mongo-db-pvc
    labels:
-     app: mongo-db
+    app.kubernetes.io/name: mongo
+    app.kubernetes.io/instance: mongo-db
+    app.kubernetes.io/part-of: mongo-loader-app
 spec:
   accessModes:
-    - ReadWriteOnce # This volume can be mounted as read-write by a single pod
+    - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi # Request 2 Gigabytes of persistent storage
+      storage: 2Gi

@@ -3,11 +3,13 @@ kind: Service
 metadata:
   name: mongo-db-service
   labels:
-    app: mongo-db
+    app.kubernetes.io/name: mongo
+    app.kubernetes.io/instance: mongo-db
+    app.kubernetes.io/part-of: mongo-loader-app
 spec:
   selector:
-    app: mongo-db
+    app.kubernetes.io/instance: mongo-db
   ports:
     - protocol: TCP
-      port: 27017 # The port the service will be available on
-      targetPort: 27017 # The port on the pod to forward traffic to
+      port: 27017
+      targetPort: 27017

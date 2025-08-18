@@ -3,10 +3,12 @@ kind: Service
 metadata:
   name: mongo-api-service
   labels:
-    app: mongo-api
+    app.kubernetes.io/name: fastapi-mongo
+    app.kubernetes.io/instance: mongo-api
+    app.kubernetes.io/part-of: mongo-loader-app
 spec:
   selector:
-    app: mongo-api
+    app.kubernetes.io/instance: mongo-api
   ports:
     - protocol: TCP
       port: 8080

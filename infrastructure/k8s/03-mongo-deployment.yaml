@@ -3,23 +3,29 @@ kind: Deployment
 metadata:
   name: mongo-db-deployment
   labels:
-    app: mongo-db
+    app.kubernetes.io/name: mongo
+    app.kubernetes.io/instance: mongo-db
+    app.kubernetes.io/part-of: mongo-loader-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mongo-db
+      app.kubernetes.io/instance: mongo-db
   template:
     metadata:
       labels:
-        app: mongo-db
+        app.kubernetes.io/name: mongo
+        app.kubernetes.io/instance: mongo-db
+        app.kubernetes.io/part-of: mongo-loader-app
     spec:
       containers:
         - name: mongo
-          image: docker.io/library/mongo:6.0
+          image: docker.io/library/mongo:8.0
           ports:
             - containerPort: 27017
           envFrom:
+            - configMapRef:
+                name: mongo-db-config
             - secretRef:
                 name: mongo-db-credentials
           volumeMounts:

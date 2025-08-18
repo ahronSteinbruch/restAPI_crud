@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException, status
 from typing import List
 from beanie import PydanticObjectId
-from app.models.item import Item, ItemCreate, ItemUpdate
+from app.models import Item, ItemCreate, ItemUpdate
 
 router = APIRouter()
 
