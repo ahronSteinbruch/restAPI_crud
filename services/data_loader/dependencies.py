@@ -1,4 +1,4 @@
-# app/dependencies.py
+# data_loader/dependencies.py
 import os
 
 from .dal import DataLoader  # ייבוא הקלאס שיצרנו

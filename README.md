@@ -1,103 +1,89 @@
-
-```markdown
 # FastAPI MongoDB CRUD Service for OpenShift
 
-## 1. Overview
+## Overview
 
-This project is a complete, production-ready microservice built with FastAPI. It provides a full CRUD (Create, Read, Update, Delete) API for managing "item" documents stored in a MongoDB database.
+This project provides a robust, production-ready template for deploying a Python FastAPI application with a MongoDB backend on OpenShift. Originating as an exam assignment to fetch data via a `GET` request, this project has been significantly expanded to showcase a complete, best-practice architecture for building and deploying cloud-native microservices.
 
-The entire infrastructure, including the MongoDB database and the FastAPI application, is designed to be deployed and managed on an OpenShift cluster using declarative YAML manifests and a fully automated deployment script. The project emphasizes clean architecture, security best practices (using Secrets), and automation.
+The entire infrastructure is defined using declarative Kubernetes manifests and can be deployed automatically with dedicated scripts for both Linux/macOS and Windows.
 
-This repository serves as a comprehensive template and guide for deploying stateful Python applications on OpenShift.
+### Features & Best Practices Implemented
 
-## 2. Core Technologies
+-   **Full CRUD API:** The API was extended from a single `GET` endpoint to full Create, Read, Update, and Delete functionality.
+-   **Modular API Architecture:** Uses FastAPI's `APIRouter` and a dependency injection pattern to keep API logic clean, organized, and scalable, preventing circular dependencies.
+-   **High-Performance DAL:** Implements a MongoDB **Connection Pool** (managed by the async driver) in the Data Access Layer (DAL).
+-   **Declarative Infrastructure (IaC):** All OpenShift/Kubernetes resources are defined in standardized YAML manifests.
+-   **Dual Deployment Strategies:** Provides manifests for deploying MongoDB using both a standard `Deployment` and an advanced `StatefulSet`.
+-   **Advanced Configuration Management:** Clear separation between non-sensitive configuration (`ConfigMap`) and secrets (`Secret`).
+-   **Reliability & Health Monitoring:** Includes **liveness and readiness probes** for both the API and the database.
+-   **Resource Management:** Defines CPU and memory `requests` and `limits` to guarantee performance and prevent resource starvation.
+-   **Full Automation:** Provides cross-platform deployment scripts (`.sh` and `.bat`) for a complete, one-command setup for both deployment strategies.
 
-- **Backend Framework**: Python 3.11 with **FastAPI**
-- **Database**: **MongoDB** (deployed on OpenShift)
-- **Asynchronous Driver**: **Motor**
-- **Object-Document Mapper (ODM)**: **Beanie**
-- **Containerization**: **Docker**
-- **Orchestration Platform**: **OpenShift** / Kubernetes
+---
 
-## 3. Project Structure
+## Project Structure & In-Depth Documentation
 
-The project follows a clean architecture to separate concerns:
+The project is organized into distinct directories, each with its own detailed documentation (in Hebrew).
 
-```text
-fastapi-mongo-crud/
-├── app/                  # Contains all the application source code
-│   ├── api/              # API endpoint routers (e.g., items.py)
-│   ├── core/             # Application settings and configuration
-│   ├── db/               # Database connection logic
-│   └── models/           # Data models and schemas (Beanie/Pydantic)
-├── docs/                 # In-depth guides explaining each development stage
+```
+.
+├── app/
+│   ├── core/           # Core components like shared dependencies
+│   ├── crud/           # APIRouters for CRUD operations
+│   ├── dal.py          # Data Access Layer (DAL)
+│   ├── main.py         # Main FastAPI application entrypoint
+│   ├── models.py       # Pydantic data models
+│   └── README.md       # ➡️ (Hebrew) In-depth explanation of the Python code architecture
 ├── infrastructure/
-│   └── k8s/              # All OpenShift/Kubernetes YAML manifests
+│   └── k8s/
+│       ├── README.md   # ➡️ (Hebrew) In-depth explanation of all YAML manifests
+│       └── ...         # All Kubernetes/OpenShift YAML manifests
 ├── scripts/
-│   ├── deploy.bat        # Automated deployment script for Windows
-│   └── deploy.sh         # Automated deployment script for Linux/macOS
-├── .gitignore
+│   ├── deploy.sh       # Automated deployment script (Deployment strategy)
+│   └── deploy-statefulset.sh # Automated deployment script (StatefulSet strategy)
 ├── Dockerfile
-└── requirements.txt
+├── demo_guide.md       # ➡️ (Hebrew) Step-by-step manual deployment & usage guide
+└── README.md           # This file
 ```
 
-## 4. Deployment to OpenShift (Automated)
+### Navigating the Documentation
 
-This project is designed to be deployed from start to finish with a single script.
+*   To understand the **Python code architecture**, read the **[Python Architecture Guide (Hebrew)](./app/README.md)**.
+*   To understand the **Kubernetes/OpenShift resources**, read the **[Infrastructure Manifests Guide (Hebrew)](./infrastructure/k8s/README.md)**.
+*   For a **step-by-step manual deployment tutorial**, follow the **[Manual Deployment Guide (Hebrew)](./demo_guide.md)**.
+
+---
+
+## Automated Deployment
+
+For a quick setup, use the provided automation scripts from the `scripts/` directory.
 
 ### Prerequisites
 
-1.  Access to an OpenShift cluster.
-2.  The `oc` (OpenShift CLI) command-line tool installed and authenticated.
-3.  A Docker Hub account.
-4.  Docker Desktop (or Docker daemon) installed, running, and authenticated (`docker login`).
+1.  Access to an OpenShift cluster and the `oc` CLI.
+2.  A Docker Hub account (`docker login` executed).
+3.  Docker Desktop (or Docker daemon) running.
 
-### Deployment Steps
+### Instructions
 
-1.  **Clone the Repository:**
-    ```bash
-    git clone <repository-url>
-    cd fastapi-mongo-crud
-    ```
+Run the appropriate script for your desired deployment strategy, providing your Docker Hub username as the first argument.
 
-2.  **Select Your OpenShift Project:**
-    Ensure you are in the correct OpenShift project where you want to deploy the resources.
-    ```bash
-    # View available projects
-    oc projects
-    
-    # Switch to your desired project
-    oc project <your-project-name>
-    ```
+#### Standard Deployment
+```bash
+# For Linux / macOS
+chmod +x scripts/deploy.sh
+./scripts/deploy.sh your-dockerhub-username
 
-3.  **Run the Deployment Script:**
-    Execute the script from the root directory of the project. It will handle everything: building and pushing the image, and applying all the OpenShift manifests.
-
-    First, make the script executable:
-    ```bash
-    chmod +x scripts/deploy.sh
-    ```
-    Then, run it from the project root directory, **providing your Docker Hub username as an argument**:
-    ```bash
-    ./scripts/deploy.sh your-dockerhub-username
-    ```
-    The script will guide you through the process and print the final application URL upon completion.
-
-## 5. API Endpoints
-
-Once deployed, the service will be available at the URL provided by the script. The API endpoints are under the `/api/v1/items` prefix.
-
-| Method | Path                  | Description                |
-|--------|-----------------------|----------------------------|
-| `POST` | `/`                   | Create a new item.         |
-| `GET`  | `/`                   | Retrieve all items.        |
-| `GET`  | `/{item_id}`          | Retrieve a single item.    |
-| `PUT`  | `/{item_id}`          | Update an existing item.   |
-| `DELETE`| `/{item_id}`          | Delete an item.            |
-
-You can access the interactive Swagger UI documentation at `http://<your-route-url>/docs`.
-
-## 6. Development Stages Documentation
-
-For a detailed, step-by-step explanation of how this project was built, including technical decisions and alternatives considered, please refer to the guides in the `/docs` directory.
+# For Windows
+.\scripts\deploy.bat your-dockerhub-username
 ```
+
+#### StatefulSet Deployment
+```bash
+# For Linux / macOS
+chmod +x scripts/deploy-statefulset.sh
+./scripts/deploy-statefulset.sh your-dockerhub-username
+
+# For Windows
+.\scripts\deploy-statefulset.bat your-dockerhub-username
+```
+The script will build the image, deploy all resources, and print the final application URL.
