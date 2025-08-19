@@ -29,7 +29,7 @@ echo ===========================================================================
 echo    Step 1: Building and Pushing Docker Image
 echo ================================================================================
 echo [INFO] Image to be built: %FULL_IMAGE_NAME%
-docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t "%FULL_IMAGE_NAME%" --push .
+docker buildx build --no-cache --platform linux/amd64 -t "%FULL_IMAGE_NAME%" --push .
 IF %ERRORLEVEL% NEQ 0 ( echo [ERROR] Docker build failed. & exit /b 1 )
 echo [SUCCESS] Image successfully pushed to Docker Hub.
 
