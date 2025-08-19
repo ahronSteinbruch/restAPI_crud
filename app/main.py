@@ -5,6 +5,7 @@ from typing import List
 from fastapi import FastAPI, HTTPException, status
 
 from . import models
+from .crud import items
 from .dependencies import data_loader
 
 
@@ -26,6 +27,7 @@ app = FastAPI(
     version="1.0",
     description="A microservice for managing items, deployed on OpenShift.",
 )
+app.include_router(items.router)
 
 
 @app.get(
