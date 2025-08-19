@@ -3,11 +3,13 @@ kind: Service
 metadata:
   name: mongo-db-headless-service
   labels:
-    app: mongo-db
+    app.kubernetes.io/name: mongo
+    app.kubernetes.io/instance: mongo-db
+    app.kubernetes.io/part-of: mongo-loader-app
 spec:
   clusterIP: None
   selector:
-    app: mongo-db
+    app.kubernetes.io/instance: mongo-db
   ports:
     - protocol: TCP
       port: 27017

@@ -7,3 +7,4 @@ metadata:
 data:
   MONGO_INITDB_ROOT_USERNAME: "mongoadmin"
   MONGO_DB_NAME: "mydatabase"
+  MONGO_COLLECTION_NAME: "data"

@@ -1,18 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo-api-deployment
+  name: mongo-api-deployment-stateful
   labels:
-    app: mongo-api
+    app.kubernetes.io/name: fastapi-mongo
+    app.kubernetes.io/instance: mongo-api-stateful
+    app.kubernetes.io/part-of: mongo-loader-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: mongo-api
+      app.kubernetes.io/instance: mongo-api-stateful
   template:
     metadata:
       labels:
-        app: mongo-api
+        app.kubernetes.io/name: fastapi-mongo
+        app.kubernetes.io/instance: mongo-api-stateful
+        app.kubernetes.io/part-of: mongo-loader-app
     spec:
       containers:
         - name: fastapi-container
@@ -22,22 +26,45 @@ spec:
             - containerPort: 8080
           env:
             - name: MONGO_HOST
-              # --- THIS IS THE KEY CHANGE ---
-              value: "mongo-db-headless-service" 
+              value: "mongo-db-headless-service"
             - name: MONGO_PORT
               value: "27017"
             - name: MONGO_DB_NAME
               valueFrom:
-                secretKeyRef:
-                  name: mongo-db-credentials
+                configMapKeyRef:
+                  name: mongo-db-config
                   key: MONGO_DB_NAME
             - name: MONGO_USER
               valueFrom:
-                secretKeyRef:
-                  name: mongo-db-credentials
+                configMapKeyRef:
+                  name: mongo-db-config
                   key: MONGO_INITDB_ROOT_USERNAME
             - name: MONGO_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mongo-db-credentials
                   key: MONGO_INITDB_ROOT_PASSWORD
+            - name: MONGO_COLLECTION_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: mongo-db-config
+                  key: MONGO_COLLECTION_NAME
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"

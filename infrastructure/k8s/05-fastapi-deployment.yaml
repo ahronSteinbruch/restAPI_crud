@@ -21,6 +21,7 @@ spec:
       containers:
         - name: fastapi-container
           image: "docker.io/YOUR_DOCKERHUB_USERNAME/fastapi-mongo-crud:latest"
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:
@@ -43,3 +44,27 @@ spec:
                 secretKeyRef:
                   name: mongo-db-credentials
                   key: MONGO_INITDB_ROOT_PASSWORD
+            - name: MONGO_COLLECTION_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: mongo-db-config
+                  key: MONGO_COLLECTION_NAME
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
