@@ -6,5 +6,5 @@ metadata:
     app.kubernetes.io/part-of: mongo-loader-app
 data:
   MONGO_INITDB_ROOT_USERNAME: "mongoadmin"
-  MONGO_DB_NAME: "mydatabase"
-  MONGO_COLLECTION_NAME: "data"
+  MONGO_DB_NAME: "enemy_soldiers"
+  MONGO_COLLECTION_NAME: "soldier_details"

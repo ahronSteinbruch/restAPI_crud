@@ -17,7 +17,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire 'data_loader' directory (our source code) into the container at /data_loader/data_loader.
-COPY data_loader /app/app
+COPY ./services /app/services
 
 # Expose port 8080 to the outside world. This is a common convention for cloud platforms
 # like OpenShift, which often expect applications to listen on this port.
@@ -26,4 +26,4 @@ EXPOSE 8080
 # The command to run the application when the container starts.
 # We bind to '0.0.0.0' to make the server accessible from outside the container.
 # The path to the data_loader object is 'data_loader.main:data_loader'.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "services.data_loader.main:app", "--host", "0.0.0.0", "--port", "8080"]
