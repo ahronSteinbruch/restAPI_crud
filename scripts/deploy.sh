@@ -35,7 +35,7 @@ function print_header() {
 # Step 1: Build and Push Docker Image
 print_header "Step 1: Building and Pushing Docker Image"
 echo "Image to be built: ${FULL_IMAGE_NAME}"
-docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t "${FULL_IMAGE_NAME}" --push .
+docker buildx build --no-cache --platform linux/amd64 -t "${FULL_IMAGE_NAME}" --push .
 echo "Image successfully pushed to Docker Hub."
 
 # Step 2: Apply Infrastructure to OpenShift
