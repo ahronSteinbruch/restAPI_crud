@@ -62,7 +62,7 @@ FOR /F "tokens=*" %%g IN ('powershell -Command "Get-Date -UFormat +%%s"') DO SET
 
 ```bash
 echo "Building and pushing image: ${DOCKERHUB_USERNAME}/fastapi-mongo-crud:${IMAGE_TAG}"
-docker buildx build --platform linux/amd64,linux/arm64 --no-cache -t ${DOCKERHUB_USERNAME}/fastapi-mongo-crud:${IMAGE_TAG} --push .
+docker buildx build --platform linux/amd64 --no-cache -t ${DOCKERHUB_USERNAME}/fastapi-mongo-crud:${IMAGE_TAG} --push .
 ```
 
 </details>
@@ -72,7 +72,7 @@ docker buildx build --platform linux/amd64,linux/arm64 --no-cache -t ${DOCKERHUB
 
 ```batch
 echo "Building and pushing image: %DOCKERHUB_USERNAME%/fastapi-mongo-crud:%IMAGE_TAG%"
-docker buildx build --platform linux/amd64,linux/arm64 --no-cache -t "%DOCKERHUB_USERNAME%/fastapi-mongo-crud:%IMAGE_TAG%" --push .
+docker buildx build --platform linux/amd64 --no-cache -t "%DOCKERHUB_USERNAME%/fastapi-mongo-crud:%IMAGE_TAG%" --push .
 ```
 </details>
 
